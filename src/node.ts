@@ -27,7 +27,6 @@
  */
 export type DendroNodeListener<T> = (value: T) => void;
 
-
 export class DendroNode<T> {
   private listeners = new Set<DendroNodeListener<T>>();
 
@@ -45,14 +44,16 @@ export class DendroNode<T> {
     this.listeners.delete(listener);
   }
 
-  emit(value: T): void {
-    this.value = value;
-    this.listeners.forEach((listener) => {
-      listener(value);
-    });
+  write(value: T): void {
+    if (!Object.is(this.value, value)) {
+      this.value = value;
+      this.listeners.forEach((listener) => {
+        listener(value);
+      });
+    }
   }
 
-  read() {
+  read(): T {
     return this.value;
   }
 }
