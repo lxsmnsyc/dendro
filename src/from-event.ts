@@ -25,10 +25,22 @@
  * @author Alexis Munsayac <alexis.munsayac@gmail.com>
  * @copyright Alexis Munsayac 2020
  */
-export * from './node';
-export * from './edge';
-export * from './from-event';
+import { DendroNode } from './node';
 
-export { default as node } from './node';
-export { default as edge } from './edge';
-export { default as fromEvent } from './from-event';
+export class DendroEventNode extends DendroNode<Event | undefined> {
+  constructor(target: EventTarget, type: string, options?: AddEventListenerOptions | boolean) {
+    super(undefined);
+
+    target.addEventListener(type, (event) => {
+      this.write(event);
+    }, options);
+  }
+}
+
+export default function fromEvent(
+  target: EventTarget,
+  type: string,
+  options?: AddEventListenerOptions | boolean,
+): DendroEventNode {
+  return new DendroEventNode(target, type, options);
+}
