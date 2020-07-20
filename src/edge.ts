@@ -29,20 +29,7 @@ import { defer } from './utils';
 import { DendroNode, DendroNodeListener } from './node';
 
 export type DendroNodeReader = <T>(emitter: DendroNode<T>) => T;
-
-export interface DendroEdgeGetInterface {
-  get: DendroNodeReader;
-}
-
-export type DendroEdgeGet<T> =
-  (methods: DendroEdgeGetInterface) => T;
-export type DendroEdgeSet<T> =
-  (methods: DendroEdgeGetInterface) => T;
-
-export interface DendroEdgeConstructor<T> {
-  get: DendroEdgeGet<T>;
-  set: DendroEdgeSet<T>;
-}
+export type DendroEdgeGet<T> = (get: DendroNodeReader) => T;
 
 interface Ref<T> {
   value?: T;
@@ -51,53 +38,56 @@ interface Ref<T> {
 export class DendroEdge<T> extends DendroNode<T> {
   private dependencies: Set<DendroNode<any>>;
 
-  private edgeConstructor: DendroEdgeConstructor<T>;
-  
+  private transform: DendroEdgeGet<T>;
+
   private onEmit: DendroNodeListener<any>;
 
-  private getInterface: DendroEdgeGetInterface;
+  private get: DendroNodeReader;
 
   private static dependencies: Set<DendroNode<any>>;
-  private static onEmit: DendroNodeListener<any>;
-  private static edge: Ref<DendroEdge<any>>;
-  private static getInterface: DendroEdgeGetInterface;
 
-  private static initialCompute<T>(edgeConstructor: DendroEdgeConstructor<T>): T {
+  private static onEmit: DendroNodeListener<any>;
+
+  private static edge: Ref<DendroEdge<any>>;
+
+  private static get: DendroNodeReader;
+
+  private static initialCompute<T>(transform: DendroEdgeGet<T>): T {
     const edgeRef: Ref<DendroEdge<any>> = {};
 
     const dependencies = new Set<DendroNode<any>>();
-  
-    const onEmit = () => {
-      edgeRef.value?.recompute();
-    };
 
-    const getInterface: DendroEdgeGetInterface = {
-      get(node) {
-        if (!dependencies.has(node)) {
-          dependencies.add(node);
-          node.addListener(onEmit);
-        }
-        return node.read();
+    const onEmit = () => {
+      if (edgeRef.value) {
+        edgeRef.value.recompute();
       }
     };
 
-    const value = edgeConstructor.get(getInterface);
+    const get: DendroNodeReader = (node) => {
+      if (!dependencies.has(node)) {
+        dependencies.add(node);
+        node.addListener(onEmit);
+      }
+      return node.read();
+    };
+
+    const value = transform(get);
 
     DendroEdge.edge = edgeRef;
     DendroEdge.dependencies = dependencies;
     DendroEdge.onEmit = onEmit;
-    DendroEdge.getInterface = getInterface;
+    DendroEdge.get = get;
 
     return value;
   }
 
-  constructor(edgeConstructor: DendroEdgeConstructor<T>) {
-    super(DendroEdge.initialCompute(edgeConstructor));
+  constructor(transform: DendroEdgeGet<T>) {
+    super(DendroEdge.initialCompute(transform));
 
-    this.edgeConstructor = edgeConstructor;
+    this.transform = transform;
     this.dependencies = DendroEdge.dependencies;
     this.onEmit = DendroEdge.onEmit;
-    this.getInterface = DendroEdge.getInterface;
+    this.get = DendroEdge.get;
 
     DendroEdge.edge.value = this;
   }
@@ -111,19 +101,24 @@ export class DendroEdge<T> extends DendroNode<T> {
 
     this.scheduled = true;
 
-    defer(() => {
-      this.scheduled = false;
-      if (this.dependencies) {
-        this.dependencies.forEach((dependency) => {
-          dependency.removeListener(this.onEmit);
-        });
-        this.dependencies.clear();
-      }
-      this.emit(this.edgeConstructor.get(this.getInterface));
-    });
+    defer(
+      () => {
+        this.scheduled = false;
+        if (this.dependencies) {
+          this.dependencies.forEach((dependency) => {
+            dependency.removeListener(this.onEmit);
+          });
+          this.dependencies.clear();
+        }
+        this.write(this.transform(this.get));
+      },
+      (err) => {
+        throw err;
+      },
+    );
   }
 }
 
-export default function edge<T>(edgeConstructor: DendroEdgeConstructor<T>): DendroEdge<T> {
-  return new DendroEdge<T>(edgeConstructor);
+export default function edge<T>(transform: DendroEdgeGet<T>): DendroEdge<T> {
+  return new DendroEdge<T>(transform);
 }
