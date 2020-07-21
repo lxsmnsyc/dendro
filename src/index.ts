@@ -25,10 +25,117 @@
  * @author Alexis Munsayac <alexis.munsayac@gmail.com>
  * @copyright Alexis Munsayac 2020
  */
-export * from './node';
-export * from './edge';
-export * from './from-event';
+export type DendroReader = <T>(dendro: Dendro<T>) => T;
+export type DendroSupplier<T> = (get: DendroReader) => T;
+export type DendroErrorHandler = (error: Error) => void;
+export type DendroListener<T> = (value: T) => void;
 
-export { default as node } from './node';
-export { default as edge } from './edge';
-export { default as fromEvent } from './from-event';
+function defer(
+  action: () => void | Promise<void>,
+  rescue: (error: Error) => void,
+): void {
+  Promise.resolve()
+    .then(action)
+    .catch(rescue);
+}
+
+export class Dendro<T> {
+  private value: T;
+
+  private dependencies: Set<Dendro<any>>;
+
+  private listeners = new Set<DendroListener<T>>();
+
+  private supplier: DendroSupplier<T>;
+
+  private onError?: DendroErrorHandler;
+
+  constructor(supplier: DendroSupplier<T>, onError?: DendroErrorHandler) {
+    this.supplier = supplier;
+    this.dependencies = new Set();
+    this.value = supplier(this.get);
+    this.onError = onError;
+  }
+
+  private scheduled = false;
+
+  private recompute() {
+    if (this.scheduled) {
+      return;
+    }
+
+    this.scheduled = true;
+
+    defer(
+      () => {
+        this.scheduled = false;
+        this.dependencies.forEach((dependency) => {
+          dependency.removeListener(this.onEmit);
+        });
+        this.dependencies.clear();
+        this.write(this.supplier(this.get));
+      },
+      this.reportError,
+    );
+  }
+
+  private onEmit = () => {
+    this.recompute();
+  };
+
+  private get = <R>(node: Dendro<R>): R => {
+    if (!this.dependencies.has(node)) {
+      this.dependencies.add(node);
+      node.addListener(this.onEmit);
+    }
+    return node.read();
+  }
+
+  addListener(listener: DendroListener<T>): void {
+    this.listeners.add(listener);
+  }
+
+  removeListener(listener: DendroListener<T>): void {
+    this.listeners.delete(listener);
+  }
+
+  write(value: T): void {
+    if (!Object.is(this.value, value)) {
+      this.value = value;
+      this.listeners.forEach((listener) => {
+        listener(value);
+      });
+    }
+  }
+
+  read(): T {
+    return this.value;
+  }
+
+  reportError = (error: Error): void => {
+    if (this.onError) {
+      this.onError(error);
+    } else {
+      throw error;
+    }
+  }
+}
+
+export function fromEvent(
+  target: EventTarget,
+  type: string,
+  options?: AddEventListenerOptions | boolean,
+): Dendro<Event | undefined> {
+  const instance = new Dendro<Event | undefined>(() => undefined);
+  target.addEventListener(type, (value) => {
+    instance.write(value);
+  }, options);
+  return instance;
+}
+
+export default function dendro<T>(
+  supplier: DendroSupplier<T>,
+  onError?: DendroErrorHandler,
+): Dendro<T> {
+  return new Dendro<T>(supplier, onError);
+}
