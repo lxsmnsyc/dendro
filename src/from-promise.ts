@@ -25,10 +25,15 @@
  * @author Alexis Munsayac <alexis.munsayac@gmail.com>
  * @copyright Alexis Munsayac 2020
  */
-import dendro from './dendro';
+import { Dendro } from './dendro';
 
-export { default as Dendro } from './dendro';
-export { default as fromEvent } from './from-event';
-export { default as fromPromise } from './from-promise';
-
-export default dendro;
+export default function fromPromise<T>(
+  promise: Promise<T>,
+): Dendro<T | undefined> {
+  const instance = new Dendro<T | undefined>(() => undefined);
+  promise.then(
+    (value) => instance.write(value),
+    (value) => instance.reportError(value),
+  );
+  return instance;
+}

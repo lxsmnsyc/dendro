@@ -18,10 +18,17 @@ const delayedCounter = dendro(async (get) => {
 
 
 const tuple = dendro(async (get) => {
+  await sleep(2000);
   const message = get(messageCounter);
   const delayed = await get(delayedCounter);
 
   return [message, delayed];
+});
+
+messageCounter.addListener(console.log);
+
+delayedCounter.addListener((value) => {
+  value.then(console.log);
 });
 
 tuple.addListener((value) => {
@@ -32,4 +39,4 @@ counter.write(1);
 
 setTimeout(() => {
   counter.write(1000);
-}, 2500);
+}, 5000);
