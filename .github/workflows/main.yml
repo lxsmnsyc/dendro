@@ -25,11 +25,6 @@ jobs:
         run: yarn install --frozen-lockfile
         env:
           CI: true
-      
-      - name: Bootstrap packages
-        run: yarn lerna bootstrap
-        env:
-          CI: true
 
       - name: Lint
         run: yarn lint
