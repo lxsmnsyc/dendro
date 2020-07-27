@@ -25,13 +25,8 @@ jobs:
         run: yarn install --frozen-lockfile
         env:
           CI: true
-
-      - name: Install package dependencies
-        run: yarn lerna run install
-        env:
-          CI: true
       
-      - name: Bootstrap Lerna Packages
+      - name: Bootstrap packages
         run: yarn lerna bootstrap
         env:
           CI: true
