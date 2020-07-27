@@ -21,10 +21,14 @@
   "author": "Alexis Munsayac",
   "module": "dist/dendro.esm.js",
   "devDependencies": {
+    "fast-check": "^2.0.0",
     "tsdx": "^0.13.2",
     "tslib": "^2.0.0",
     "typescript": "^3.9.7"
   },
   "repository": "https://github.com/LXSMNSYC/dendro.git",
-  "private": false
+  "private": false,
+  "dependencies": {
+    "fast-check": "^2.0.0"
+  }
 }
