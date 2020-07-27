@@ -40,7 +40,7 @@ import { createDendroResource } from '@lxsmnsyc/dendro-react;
 
 const userData = dendro(() => fetch('/api/user'));
 
-const userResource = createDendroResource(fetchUser);
+const userResource = createDendroResource(userData);
 
 const value = userResource.read(); // { status: 'pending' }
 ```
