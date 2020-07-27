@@ -26,6 +26,11 @@ jobs:
         env:
           CI: true
 
+      - name: Lerna info
+        run: yarn lerna ls
+        env:
+          CI: true
+
       - name: Lint
         run: yarn lint
         env:

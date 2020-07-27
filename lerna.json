@@ -9,7 +9,7 @@
       "exact": true
     },
     "publish": {
-      "npmClient": "npm",
+      "npmClient": "yarn",
       "allowBranch": [
         "master"
       ],
