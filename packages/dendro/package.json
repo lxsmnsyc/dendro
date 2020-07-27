@@ -1,0 +1,31 @@
+{
+  "version": "0.1.1",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "engines": {
+    "node": ">=10"
+  },
+  "scripts": {
+    "start": "tsdx watch",
+    "build": "tsdx build",
+    "test": "tsdx test",
+    "lint": "eslint \"./src/*.ts\"",
+    "prepare": "tsdx build"
+  },
+  "peerDependencies": {},
+  "name": "@lxsmnsyc/dendro",
+  "author": "Alexis Munsayac",
+  "module": "dist/dendro.esm.js",
+  "devDependencies": {
+    "tsdx": "^0.13.2",
+    "tslib": "^2.0.0",
+    "typescript": "^3.9.7"
+  },
+  "repository": "https://github.com/LXSMNSYC/dendro.git",
+  "private": false
+}
