@@ -1,12 +1,17 @@
 {
   "version": "0.1.0",
   "license": "MIT",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
     "lint:dendro": "eslint \"packages/dendro/src/**\"",
     "lint:dendro-react": "eslint \"packages/dendro-react/src/**\"",
-    "lint": "npm run lint:dendro && npm run lint:dendro-react"
+    "lint": "yarn lint:dendro && yarn lint:dendro-react",
+    "build": "yarn lerna run build",
+    "lerna": "lerna"
   },
-  "peerDependencies": {},
   "author": "Alexis Munsayac",
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^3.6.0",
@@ -16,9 +21,10 @@
     "eslint-import-resolver-node": "^0.3.2",
     "eslint-import-resolver-typescript": "^2.0.0",
     "eslint-plugin-import": "^2.22.0",
+    "lerna": "^3.22.1",
     "tslib": "^2.0.0",
     "typescript": "^3.9.7"
   },
   "repository": "https://github.com/LXSMNSYC/dendro.git",
-  "private": false
+  "name": "dendro"
 }
