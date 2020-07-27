@@ -27,7 +27,7 @@ jobs:
           CI: true
       
       - name: Setup lerna
-        run: yarn lerna boostrap
+        run: yarn lerna bootstrap
         env:
           CI: true
 
