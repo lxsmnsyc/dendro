@@ -25,6 +25,11 @@ jobs:
         run: yarn install --frozen-lockfile
         env:
           CI: true
+      
+      - name: Setup lerna
+        run: yarn lerna boostrap
+        env:
+          CI: true
 
       - name: Lint
         run: yarn lint
