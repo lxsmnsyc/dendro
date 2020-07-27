@@ -17,7 +17,6 @@
     "lint": "eslint \"./src/*.ts\"",
     "prepare": "tsdx build"
   },
-  "peerDependencies": {},
   "name": "@lxsmnsyc/dendro",
   "author": "Alexis Munsayac",
   "module": "dist/dendro.esm.js",

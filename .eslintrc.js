@@ -1,4 +1,7 @@
+const path = require('path')
+
 module.exports = {
+  "root": true,
   "env": {
     "browser": true,
     "es6": true,
@@ -17,22 +20,25 @@ module.exports = {
     "Atomics": "readonly",
     "SharedArrayBuffer": "readonly"
   },
-  parser: '@typescript-eslint/parser',
-  parserOptions: {
-    project: './tsconfig.eslint.json',
-    ecmaVersion: 2018,
-    sourceType: 'module',
+  "parser": '@typescript-eslint/parser',
+  "parserOptions": {
+    "project": './tsconfig.eslint.json',
+    "ecmaVersion": 2018,
+    "sourceType": 'module',
   },
-  plugins: [
+  "plugins": [
     '@typescript-eslint',
   ],
-  settings: {
+  "settings": {
     "import/parsers": {
       "@typescript-eslint/parser": [".ts", ".tsx"]
     },
     "import/resolver": {
-      "typescript": {}
-    }
+      "typescript": {},
+      'eslint-import-resolver-lerna': {
+        packages: path.resolve(__dirname, 'packages')
+      }
+    },
   },
   "plugins": [
     "@typescript-eslint"
