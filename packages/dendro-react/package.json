@@ -17,13 +17,15 @@
     "prepare": "tsdx build"
   },
   "peerDependencies": {
-    "react": "^16.13.1"
+    "react": "^16.13.1",
+    "@lxsmnsyc/dendro": "^0.1.1"
   },
   "name": "@lxsmnsyc/dendro-react",
   "author": "Alexis Munsayac",
   "module": "dist/dendro-react.esm.js",
   "devDependencies": {
     "@types/react": "^16.9.43",
+    "@lxsmnsyc/dendro": "^0.1.1",
     "react": "^16.13.1",
     "tsdx": "^0.13.2",
     "tslib": "^2.0.0",
@@ -31,7 +33,4 @@
   },
   "repository": "https://github.com/LXSMNSYC/dendro.git",
   "private": false,
-  "dependencies": {
-    "@lxsmnsyc/dendro": "^0.1.1"
-  }
 }
