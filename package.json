@@ -26,8 +26,5 @@
     "typescript": "^3.9.7"
   },
   "repository": "https://github.com/LXSMNSYC/dendro.git",
-  "name": "dendro",
-  "dependencies": {
-    "eslint-import-resolver-lerna": "^1.1.0"
-  }
+  "name": "dendro"
 }

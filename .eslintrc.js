@@ -1,5 +1,3 @@
-const path = require('path')
-
 module.exports = {
   "root": true,
   "env": {
@@ -35,9 +33,6 @@ module.exports = {
     },
     "import/resolver": {
       "typescript": {},
-      'eslint-import-resolver-lerna': {
-        packages: path.resolve(__dirname, 'packages')
-      }
     },
   },
   "plugins": [
