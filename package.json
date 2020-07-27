@@ -6,9 +6,7 @@
     "packages/*"
   ],
   "scripts": {
-    "lint:dendro": "eslint \"packages/dendro/src/**\"",
-    "lint:dendro-react": "eslint \"packages/dendro-react/src/**\"",
-    "lint": "yarn lint:dendro && yarn lint:dendro-react",
+    "lint": "eslint 'packages/**/*.ts{,x}'",
     "build": "yarn lerna run build",
     "lerna": "lerna"
   },
