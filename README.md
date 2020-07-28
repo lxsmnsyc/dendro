@@ -4,7 +4,6 @@
 
 ## Packages
 
-| --- | --- |
 | Package | Version |
 | --- | --- |
 | [`@lxsmnsyc/dendro`](https://github.com/lxsmnsyc/dendro/tree/master/packages/dendro) | [![NPM](https://img.shields.io/npm/v/@lxsmnsyc/dendro.svg)](https://www.npmjs.com/package/@lxsmnsyc/dendro) |
