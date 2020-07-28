@@ -30,5 +30,6 @@
   "private": false,
   "dependencies": {
     "fast-check": "^2.0.0"
-  }
+  },
+  "gitHead": "3bff3166f98ce3704e372f4259b86dd4c0c167c6"
 }
