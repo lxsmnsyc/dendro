@@ -2,6 +2,8 @@
 
 > Simple, granular, reactive, composable state management library. Inspired by Recoil.
 
+[![NPM](https://img.shields.io/npm/v/@lxsmnsyc/dendro.svg)](https://www.npmjs.com/package/@lxsmnsyc/dendro)
+
 ## Install
 
 ```bash
