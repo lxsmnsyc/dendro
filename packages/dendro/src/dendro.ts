@@ -39,24 +39,66 @@ function defer(
     .catch(rescue);
 }
 
+interface Version {
+  dependencies: Set<Dendro<any>>;
+  alive: boolean;
+}
+
 export class Dendro<T> {
+  // The state of the instance
   private value: T;
 
-  private dependencies: Set<Dendro<any>>;
+  // Version of the instance
+  private version: Version;
 
+  // Listeners of the state updates
   private listeners = new Set<DendroListener<T>>();
 
+  // Computation function
   private supplier: DendroSupplier<T>;
 
   private onError?: DendroErrorHandler;
 
   constructor(supplier: DendroSupplier<T>, onError?: DendroErrorHandler) {
     this.supplier = supplier;
-    this.dependencies = new Set();
-    this.value = supplier(this.get);
     this.onError = onError;
+    this.version = Dendro.makeVersion();
+    this.value = this.computeInternal();
   }
 
+  // Creates a new 'version' of the instance
+  private static makeVersion(): Version {
+    return {
+      dependencies: new Set<Dendro<any>>(),
+      alive: true,
+    };
+  }
+
+  private computeInternal(): T {
+    const { version } = this;
+
+    // Create computation
+    return this.supplier((node) => {
+      /**
+       * Check if the current version is still alive
+       * and check if the node to be read is not yet
+       * in the dependencies
+       *
+       * Register the node as a dependency.
+       * Previous versions should not add dependencies
+       * to prevent recomputation for the current version.
+       */
+      if (version.alive && !version.dependencies.has(node)) {
+        version.dependencies.add(node);
+        node.addListener(this.onEmit);
+      }
+
+      // Return instance state
+      return node.read();
+    });
+  }
+
+  // Flag for debouncing computations
   private scheduled = false;
 
   private recompute() {
@@ -68,12 +110,19 @@ export class Dendro<T> {
 
     defer(
       () => {
+        // Remove schedule
         this.scheduled = false;
-        this.dependencies.forEach((dependency) => {
+
+        // Clear dependencies of the previous version
+        this.version.dependencies.forEach((dependency) => {
           dependency.removeListener(this.onEmit);
         });
-        this.dependencies.clear();
-        this.write(this.supplier(this.get));
+        // Mark previous version as dead
+        this.version.alive = false;
+        // Create a new version
+        this.version = Dendro.makeVersion();
+        // Recompute and notify listeners
+        this.write(this.computeInternal());
       },
       this.reportError,
     );
@@ -82,14 +131,6 @@ export class Dendro<T> {
   private onEmit = () => {
     this.recompute();
   };
-
-  private get = <R>(node: Dendro<R>): R => {
-    if (!this.dependencies.has(node)) {
-      this.dependencies.add(node);
-      node.addListener(this.onEmit);
-    }
-    return node.read();
-  }
 
   addListener(listener: DendroListener<T>): void {
     this.listeners.add(listener);
@@ -100,8 +141,11 @@ export class Dendro<T> {
   }
 
   write(value: T): void {
+    // Compare previous state to new state
     if (!Object.is(this.value, value)) {
+      // Set new state
       this.value = value;
+      // Notify listeners
       this.listeners.forEach((listener) => {
         listener(value);
       });
